@@ -15,7 +15,7 @@ public:
 	DataType data;
 	NodePtr next;
 	bool operator== (const SinglyLinkedListNode<DataType>& otherNode) {
-		return data == otherNode.data;
+		return data == otherNode.data && next == otherNode.next;
 	}
 	bool operator!= (const SinglyLinkedListNode<DataType>& otherNode) {
 		return !(*this == otherNode);
