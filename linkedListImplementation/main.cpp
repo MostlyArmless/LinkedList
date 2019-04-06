@@ -8,4 +8,6 @@ int main()
 	std::unique_ptr<SinglyLinkedList<int>> list2 = std::make_unique<SinglyLinkedList<int>>(0);
 
 	bool equal = list == list2;
+	list->PushTail(1);
+	bool notEqual = list == list2;
 }

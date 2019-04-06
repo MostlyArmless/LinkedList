@@ -1,78 +1,67 @@
 #include "pch.h"
 #include "LinkedList.h"
 
-class LinkedListTest : public ::testing::Test {
-	//using ListPtr = std::unique_ptr<SinglyLinkedList<int>>;
+using ListPtr = std::unique_ptr<SinglyLinkedList<int>>;
+using IntNode = SinglyLinkedListNode<int>;
+
+class LinkedListTest : public ::testing::Test {	
 protected:
+	ListPtr listLength1;
+	ListPtr listLength2;
+	ListPtr listLength3;
+
 	void SetUp() override {
-	}
+		// Create a couple of lists which both only have a single node which contains the same value
 
-	// Create a couple of lists which both only have a single node which contains the same value
-	std::shared_ptr<SinglyLinkedList<int>> list = std::make_unique<SinglyLinkedList<int>>(0);
-	std::shared_ptr<SinglyLinkedList<int>> list2 = std::make_unique<SinglyLinkedList<int>>(0);
+		listLength1 = std::make_unique<SinglyLinkedList<int>>(0);
+		listLength2 = std::make_unique<SinglyLinkedList<int>>(0);
+		listLength3 = std::make_unique<SinglyLinkedList<int>>(0);
 
-	static bool LinkedListTest::checkEqual(std::shared_ptr<SinglyLinkedList<int>> list, std::shared_ptr<SinglyLinkedList<int>> list2) {
-		auto node1 = list->GetHead();
-		auto node2 = list2->GetHead();
-
-		while (node1 && node2) {
-			if (node1->data != node2->data) {
-				return false;
-			}
-			node1 = node1->next;
-			node2 = node2->next;
-		}
-
-		if (!node1 != !node2) { // XOR => only one of the lists ended
-			return false;
-		}
-		// Lists are the same length and full of the same data.
-		return true;
+		listLength2->PushTail(1);
+		listLength3->PushTail(1);
+		listLength3->PushTail(2);
 	}
 };
 
 TEST_F(LinkedListTest, Instantiation) {
-	EXPECT_EQ(list->GetTail()->data, 0);
-	EXPECT_EQ(list->GetLength(), 1);
+	EXPECT_EQ(listLength1->GetTail()->data, 0);
+	EXPECT_EQ(listLength1->GetLength(), 1);
 }
 
 TEST_F(LinkedListTest, PushTail) {
-	list->PushTail(1);
-	EXPECT_EQ(list->GetHead()->data, 0);
-	EXPECT_EQ(list->GetTail()->data, 1);
-	EXPECT_EQ(list->GetLength(), 2);
+	listLength1->PushTail(1);
+	EXPECT_EQ(listLength1->GetHead()->data, 0);
+	EXPECT_EQ(listLength1->GetTail()->data, 1);
+	EXPECT_EQ(listLength1->GetLength(), 2);
 }
 
 TEST_F(LinkedListTest, PushHead) {
-	list->PushHead(1);
-	EXPECT_EQ(list->GetHead()->data, 1);
-	EXPECT_EQ(list->GetTail()->data, 0);
-	EXPECT_EQ(list->GetLength(), 2);
+	listLength1->PushHead(1);
+	EXPECT_EQ(listLength1->GetHead()->data, 1);
+	EXPECT_EQ(listLength1->GetTail()->data, 0);
+	EXPECT_EQ(listLength1->GetLength(), 2);
 }
 
 TEST_F(LinkedListTest, ReverseListLength1) {
-	auto headBefore = list->GetHead();
-	auto tailBefore = list->GetTail();
-	list->ReverseList();
-	auto headAfter = list->GetHead();
-	auto tailAfter = list->GetTail();
+	auto headBefore = listLength1->GetHead();
+	auto tailBefore = listLength1->GetTail();
+	listLength1->ReverseList();
+	auto headAfter = listLength1->GetHead();
+	auto tailAfter = listLength1->GetTail();
 
 	EXPECT_EQ(headBefore, tailAfter);
 	EXPECT_EQ(tailBefore, headAfter);
-	EXPECT_EQ(list->GetLength(), 1);
+	EXPECT_EQ(listLength1->GetLength(), 1);
 }
 
 TEST_F(LinkedListTest, ReverseListLength3) {
-	list->PushTail(1);
-	list->PushTail(2);
-
-	auto headValueBefore = list->GetHead()->data;
-	auto tailValueBefore = list->GetTail()->data;
-	auto lengthBefore = list->GetLength();
-	list->ReverseList();
-	auto headValueAfter = list->GetHead()->data;
-	auto tailValueAfter = list->GetTail()->data;
-	auto lengthAfter = list->GetLength();
+	auto headValueBefore = listLength3->GetHead()->data;
+	auto tailValueBefore = listLength3->GetTail()->data;
+	auto lengthBefore = listLength3->GetLength();
+	listLength3->ReverseList();
+	auto headValueAfter = listLength3->GetHead()->data;
+	auto tailValueAfter = listLength3->GetTail()->data;
+	auto lengthAfter = listLength3->GetLength();
 
 	EXPECT_EQ(headValueBefore, tailValueAfter);
 	EXPECT_EQ(tailValueBefore, headValueAfter);
@@ -80,48 +69,77 @@ TEST_F(LinkedListTest, ReverseListLength3) {
 }
 
 TEST_F(LinkedListTest, DeleteOnlyNode) {
-	EXPECT_TRUE(list->DeleteNode(0));
-	EXPECT_EQ(list->GetLength(), 0);
-}
-
-TEST_F(LinkedListTest, DeleteNodeFromEmptyList) {
-	EXPECT_FALSE(list->DeleteNode(1));
-	EXPECT_EQ(list->GetLength(), 1);
+	EXPECT_TRUE(listLength1->DeleteNode(0));
+	EXPECT_EQ(listLength1->GetLength(), 0);
 }
 
 TEST_F(LinkedListTest, DeleteNodeAtNegativePosition) {
-	EXPECT_EQ(list->GetLength(), 1);
-	EXPECT_FALSE(list->DeleteNode(-1));
-	EXPECT_EQ(list->GetLength(), 1);
+	EXPECT_EQ(listLength1->GetLength(), 1);
+	EXPECT_FALSE(listLength1->DeleteNode(-1));
+	EXPECT_EQ(listLength1->GetLength(), 1);
 }
 
 TEST_F(LinkedListTest, DeleteNodeAtTail) {
-	list->PushTail(1);
-	EXPECT_EQ(list->GetLength(), 2) << "Length before should be 2";
-	bool deleteSuccessful = list->DeleteNode(1);
+	EXPECT_EQ(listLength2->GetLength(), 2) << "Length before should be 2";
+	bool deleteSuccessful = listLength2->DeleteNode(1);
 	EXPECT_TRUE(deleteSuccessful) << "Delete function should return true";
-	EXPECT_EQ(list->GetLength(), 1) << "Length after deletion should be 1";
-	EXPECT_EQ(list->GetDataAtPosition(0), 0);
+	EXPECT_EQ(listLength2->GetLength(), 1) << "Length after deletion should be 1";
+	EXPECT_EQ(listLength2->GetDataAtPosition(0), 0);
 }
 
 TEST_F(LinkedListTest, DeleteNodeAtHead) {
-	list->PushTail(1);
-	EXPECT_EQ(list->GetLength(), 2) << "Length before should be 2";
-	bool deleteSuccessful = list->DeleteNode(0);
+	EXPECT_EQ(listLength2->GetLength(), 2) << "Length before should be 2";
+	bool deleteSuccessful = listLength2->DeleteNode(0);
 	EXPECT_TRUE(deleteSuccessful) << "Delete function should return true";
-	EXPECT_EQ(list->GetLength(), 1) << "Length after deletion should be 1";
-	EXPECT_EQ(list->GetDataAtPosition(0), 1);
+	EXPECT_EQ(listLength2->GetLength(), 1) << "Length after deletion should be 1";
+	EXPECT_EQ(listLength2->GetDataAtPosition(0), 1);
 }
 
-TEST_F(LinkedListTest, EqualityOperatorWhenBothLength1) {
-	EXPECT_TRUE(LinkedListTest::checkEqual(list, list2));
+TEST_F(LinkedListTest, EqualityOperatorWhenEqualAndSize2) {
+	listLength1->PushTail(1);
+	EXPECT_TRUE(*listLength1 == *listLength2);
 }
 
-TEST_F(LinkedListTest, EqualityOperatorWhenBothEmpty) {
-	EXPECT_TRUE(LinkedListTest::checkEqual(list, list2));
+TEST_F(LinkedListTest, EqualityOperatorWhenUnequalLengths) {
+	EXPECT_FALSE(*listLength1 == *listLength2);
+}
+
+TEST_F(LinkedListTest, EqualityOperatorWhenEqualLengthsButUnequalData) {
+	listLength1->PushTail(42);
+	EXPECT_FALSE(*listLength1 == *listLength2);
+}
+
+TEST_F(LinkedListTest, InequalityOperatorWhenBothLength1) {
+	listLength1->PushTail(1);
+	EXPECT_TRUE(*listLength1 == *listLength2);
 }
 
 TEST_F(LinkedListTest, EqualityOperatorWhenUnequal) {
-	list2->PushTail(1);
-	EXPECT_FALSE(list == list2);
+	EXPECT_FALSE(*listLength1 == *listLength2);
+}
+
+TEST(NodeEqualityOperatorWhenEqual) {
+	auto node1 = IntNode(0);
+	auto node2 = IntNode(0);
+
+	ASSERT_TRUE(node1 == node2);
+	ASSERT_FALSE(node1 != node2);
+}
+
+TEST(NodeEqualityOperatorWhenUnqualNextNodes) {
+	auto node1 = IntNode(0);
+	auto node2 = IntNode(0);
+	auto nodeNext = IntNode(1);
+	node1.next = std::make_shared<IntNode>(nodeNext);
+
+	ASSERT_TRUE(node1 == node2);
+	ASSERT_FALSE(node1 != node2);
+}
+
+TEST(NodeEqualityOperatorWhenUnqualNextValues) {
+	auto node1 = std::make_shared<IntNode>(0);
+	auto node2 = std::make_shared<IntNode>(1);
+
+	ASSERT_FALSE(node1 == node2);
+	ASSERT_TRUE(node1 != node2);
 }
