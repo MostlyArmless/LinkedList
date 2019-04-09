@@ -27,9 +27,14 @@ namespace LinkedListTesting {
 	}
 
 	TEST_F(LinkedListTest, PushTail) {
+		listLength0->PushTail(0);
+		EXPECT_EQ(listLength0->GetLength(), 1);
+		EXPECT_EQ(listLength0->GetDataAtHead(), 0);
+		EXPECT_EQ(listLength0->GetDataAtTail(), 0);
+
 		listLength1->PushTail(1);
-		EXPECT_EQ(listLength1->GetHead()->data, 0);
-		EXPECT_EQ(listLength1->GetTail()->data, 1);
+		EXPECT_EQ(listLength1->GetDataAtHead(), 0);
+		EXPECT_EQ(listLength1->GetDataAtTail(), 1);
 		EXPECT_EQ(listLength1->GetLength(), 2);
 	}
 
@@ -91,6 +96,16 @@ namespace LinkedListTesting {
 		EXPECT_TRUE(deleteSuccessful) << "Delete function should return true";
 		EXPECT_EQ(listLength2->GetLength(), 1) << "Length after deletion should be 1";
 		EXPECT_EQ(listLength2->GetDataAtPosition(0), 1);
+	}
+
+	TEST_F(LinkedListTest, DeleteNodeFromMiddle) {
+		auto lengthBefore = listLength3->GetLength();
+		listLength3->DeleteNode(1);
+		auto lengthAfter = listLength3->GetLength();
+		EXPECT_EQ(lengthBefore, lengthAfter + 1);
+		EXPECT_EQ(listLength3->GetDataAtPosition(0), 0);
+		EXPECT_EQ(listLength3->GetDataAtPosition(1), 2);
+		EXPECT_ANY_THROW(listLength3->GetDataAtPosition(2));
 	}
 
 	TEST_F(LinkedListTest, EqualityOperatorWhenEqualAndSize2) {
@@ -164,6 +179,11 @@ namespace LinkedListTesting {
 		ASSERT_EQ(listLength1->GetDataAtTail(), 0);
 		ASSERT_EQ(listLength2->GetDataAtTail(), 1);
 		ASSERT_EQ(listLength3->GetDataAtTail(), 2);
+	}
+
+	TEST_F(LinkedListTest, GetNodeAtPosition) {
+		EXPECT_ANY_THROW(listLength0->GetNodeAtPosition(0));
+		EXPECT_ANY_THROW(listLength0->GetNodeAtPosition(1));
 	}
 
 }

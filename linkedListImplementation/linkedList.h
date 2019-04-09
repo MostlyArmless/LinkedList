@@ -163,16 +163,19 @@ public:
 	}
 
 	NodePtr GetNodeAtPosition(int positionFromHead) {
-		int currentPosition = 0;
-		NodePtr prev;
-		auto curr = head;
-		auto next = curr->next;
-
-		while (currentPosition < positionFromHead && curr) {
-			
+		if (head == nullptr) {
+			throw "List is empty, can't get node at position " + positionFromHead;
 		}
-		
-		return curr;
+		auto node = head;
+		int currentPosition = 0;
+		while (currentPosition < positionFromHead && node->next) {
+			node = node->next;
+			currentPosition++;
+		}
+		if (currentPosition == positionFromHead) {
+			return node;
+		}
+		throw "Attempted to access node beyond the end of a list";
 	}
 
 	// Where 0 = tail, 1 = one node before the tail, etc.
