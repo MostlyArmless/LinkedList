@@ -17,8 +17,9 @@ public:
 		data(otherNode.data)
 	{}
 	~SinglyLinkedListNode() {}
-	bool operator= (const Node& otherNode) {
-		return data == otherNode.data && &next == &otherNode;
+	void operator= (const Node& otherNode) {
+		data = otherNode.data;
+		next = otherNode.next;
 	}
 
 	DataType data;
