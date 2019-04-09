@@ -10,8 +10,6 @@ namespace LinkedListTesting {
 		IntListPtr listLength3;
 
 		void SetUp() override {
-			// Create a couple of lists which both only have a single node which contains the same value
-
 			listLength0 = std::make_unique<IntList>();
 			listLength1 = std::make_unique<IntList>(0);
 			listLength2 = std::make_unique<IntList>(0);
@@ -129,10 +127,6 @@ namespace LinkedListTesting {
 		EXPECT_ANY_THROW(listLength0->GetNodeFromTail(-1));
 		EXPECT_ANY_THROW(listLength3->GetNodeFromTail(-1));
 	}
-
-	//TEST_F(LinkedListTest, GetNodeFromTailBeforeStartOfList) {
-	//	EXPECT_ANY_THROW(listLength1->GetNodeFromTail(3));
-	//}
 
 	TEST_F(LinkedListTest, PrintListLength0) {
 		testing::internal::CaptureStdout();
