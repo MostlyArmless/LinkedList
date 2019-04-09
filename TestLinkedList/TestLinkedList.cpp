@@ -4,6 +4,7 @@
 namespace LinkedListTesting {
 	class LinkedListTest : public ::testing::Test {
 	protected:
+		IntListPtr listLength0;
 		IntListPtr listLength1;
 		IntListPtr listLength2;
 		IntListPtr listLength3;
@@ -11,6 +12,7 @@ namespace LinkedListTesting {
 		void SetUp() override {
 			// Create a couple of lists which both only have a single node which contains the same value
 
+			listLength0 = std::make_unique<IntList>();
 			listLength1 = std::make_unique<IntList>(0);
 			listLength2 = std::make_unique<IntList>(0);
 			listLength3 = std::make_unique<IntList>(0);
@@ -115,4 +117,59 @@ namespace LinkedListTesting {
 	TEST_F(LinkedListTest, EqualityOperatorWhenUnequal) {
 		EXPECT_FALSE(*listLength1 == *listLength2);
 	}
+
+	TEST_F(LinkedListTest, GetNodeFromTail) {
+		auto tailNode = listLength3->GetNodeFromTail(0);
+		auto headNode = listLength3->GetNodeFromTail(2);
+		EXPECT_EQ(tailNode->data, 2);
+		EXPECT_EQ(headNode->data, 0);
+
+		EXPECT_ANY_THROW(listLength0->GetNodeFromTail(0));
+		EXPECT_ANY_THROW(listLength1->GetNodeFromTail(2));
+		EXPECT_ANY_THROW(listLength0->GetNodeFromTail(-1));
+		EXPECT_ANY_THROW(listLength3->GetNodeFromTail(-1));
+	}
+
+	//TEST_F(LinkedListTest, GetNodeFromTailBeforeStartOfList) {
+	//	EXPECT_ANY_THROW(listLength1->GetNodeFromTail(3));
+	//}
+
+	TEST_F(LinkedListTest, PrintListLength0) {
+		testing::internal::CaptureStdout();
+		listLength0->PrintList();
+		std::string actual = testing::internal::GetCapturedStdout();
+		// For consistency with non-zero length lists, we expect there to be a newline printed for empty lists
+		std::string expected = "\n";
+		ASSERT_EQ(actual, expected);
+	}
+
+	TEST_F(LinkedListTest, PrintListLength1) {
+		testing::internal::CaptureStdout();
+		listLength1->PrintList();
+		std::string actual = testing::internal::GetCapturedStdout();
+		std::string expected = "0\n";
+		ASSERT_EQ(actual, expected);
+	}
+
+	TEST_F(LinkedListTest, PrintListLength2) {
+		testing::internal::CaptureStdout();
+		listLength2->PrintList();
+		std::string actual = testing::internal::GetCapturedStdout();
+		std::string expected = "0\n1\n";
+		ASSERT_EQ(actual, expected);
+	}
+
+	TEST_F(LinkedListTest, GetDataAtHead) {
+		ASSERT_ANY_THROW(listLength0->GetDataAtHead());
+		ASSERT_EQ(listLength1->GetDataAtHead(), 0);
+		ASSERT_EQ(listLength2->GetDataAtHead(), 0);
+	}
+
+	TEST_F(LinkedListTest, GetDataAtTail) {
+		ASSERT_ANY_THROW(listLength0->GetDataAtTail());
+		ASSERT_EQ(listLength1->GetDataAtTail(), 0);
+		ASSERT_EQ(listLength2->GetDataAtTail(), 1);
+		ASSERT_EQ(listLength3->GetDataAtTail(), 2);
+	}
+
 }

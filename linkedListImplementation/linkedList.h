@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <iostream>
 
 template <typename DataType>
@@ -9,15 +10,23 @@ public:
 	SinglyLinkedListNode(DataType data) :
 		next(nullptr),
 		data(data)
-	{
+	{}
+
+	SinglyLinkedListNode(const Node& otherNode) :
+		next(otherNode.next),
+		data(otherNode.data)
+	{}
+	~SinglyLinkedListNode() {}
+	bool operator= (const Node& otherNode) {
+		return data == otherNode.data && &next == &otherNode;
 	}
 
 	DataType data;
 	NodePtr next;
-	bool operator== (const SinglyLinkedListNode<DataType>& otherNode) {
+	bool operator== (const Node& otherNode) {
 		return data == otherNode.data && next == otherNode.next;
 	}
-	bool operator!= (const SinglyLinkedListNode<DataType>& otherNode) {
+	bool operator!= (const Node& otherNode) {
 		return !(*this == otherNode);
 	}
 };
@@ -30,6 +39,11 @@ public:
 
 	NodePtr head;
 	NodePtr tail;
+
+	SinglyLinkedList() :
+		head(nullptr),
+		tail(nullptr)
+	{	};
 
 	SinglyLinkedList(DataType data) :
 		head(std::make_shared<Node>(data)),
@@ -71,8 +85,11 @@ public:
 	}
 
 	int GetLength() {
-		if (!head) {
+		if (head == nullptr) {
 			return 0;
+		}
+		if (head == tail) {
+			return 1;
 		}
 
 		auto node = head;
@@ -85,26 +102,31 @@ public:
 	}
 
 	NodePtr PushTail(DataType newData) {
-		if (head) {
-			tail->next = std::make_shared<Node>(newData);
-			tail = tail->next;
-		}
-		else {
+		if (head == nullptr) {
 			head = std::make_shared<Node>(newData);
 			tail = head;
+		}
+		else if (head == tail) {
+			tail = std::make_shared<Node>(newData);
+			head->next = tail;
+			tail->next = nullptr;
+		}
+		else {
+			tail->next = std::make_shared<Node>(newData);
+			tail = tail->next;
 		}
 		return head;
 	}
 
 	NodePtr PushHead(DataType newData) {
-		if (head) {
-			auto temp = head;
-			head = std::make_shared<SinglyLinkedListNode<DataType>>(newData);
-			head->next = temp;
+		if (head == nullptr) {
+			head = std::make_shared<Node>(newData);
+			tail = head;
 		}
 		else {
-			head = std::make_shared<SinglyLinkedListNode<DataType>>(newData);
-			tail = head;
+			auto oldHead = head;
+			head = std::make_shared<Node>(newData);
+			head->next = oldHead;
 		}
 		return head;
 	}
@@ -112,9 +134,19 @@ public:
 	void PrintList() {
 		auto node = head;
 		int nodeIndex = 0;
-		while (node) {
-			std::cout << ++nodeIndex << ": " << node->data << std::endl;
+		static auto printNodeData = [](DataType data) {std::cout << data << std::endl; };
+		if (node == nullptr) {
+			std::cout << std::endl;
+			return;
+		}
+		printNodeData(node->data);
+		if (head == tail) {
+			return; // Avoid double-printing the head for a length-1 list
+		}
+
+		while (node->next) {
 			node = node->next;
+			printNodeData(node->data);
 		}
 	}
 
@@ -145,7 +177,41 @@ public:
 
 	// Where 0 = tail, 1 = one node before the tail, etc.
 	NodePtr GetNodeFromTail(int positionFromTail) {
-		// Use a 
+		if (head == nullptr || tail == nullptr) {
+			throw "Can't get node from tail, list is empty";
+		}
+		if (positionFromTail == 0) {
+			return tail;
+		}
+		// Go all the way to the end, then backtrack.
+		// Keep track of where we've been by copying the nodes to an array as we go
+		std::vector<NodePtr> nodesInOrder{ head };
+
+		auto node = head;
+		while (node->next) {
+			node = node->next;
+			nodesInOrder.push_back(node);
+		}
+		if (positionFromTail < nodesInOrder.size()) {
+			return nodesInOrder[nodesInOrder.size() - positionFromTail - 1];
+		}
+		else {
+			throw "Attempt to access data before the beginning of SinglyLinkedList's head";
+		}
+	}
+
+	DataType GetDataAtHead() {
+		if (head != nullptr) {
+			return head->data;
+		}
+		throw "Can't get data at head, the list has no head";
+	}
+
+	DataType GetDataAtTail() {
+		if (tail != nullptr) {
+			return tail->data;
+		}
+		throw "Can't get data at tail, the list has no tail";
 	}
 
 	DataType GetDataAtPosition(int positionFromHead) {
@@ -205,5 +271,5 @@ public:
 
 		head = prev;
 		tail = newTail;
-	}
+	}	
 };
